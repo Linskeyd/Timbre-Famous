@@ -19,6 +19,17 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {};
 
+    AppView.prototype.toggleMenu = function() {
+
+        if(this.menuToggle) {
+            this.slideLeft();
+        } else {
+            this.slideRight();
+        }
+
+        this.menuToggle = !this.menuToggle;
+    }
+
     AppView.prototype.slideRight = function() {
         this.pageModifier.setTransform(Transform.translate(276, 0, 0), {
             duration: 300,
@@ -41,9 +52,7 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this.pageView.on('menuToggle', function() {
-            console.log('menu toggle!');
-        }.bind(this));
+        this.pageView.on('menuToggle', this.toggleMenu.bind(this));
     }
 
     module.exports = AppView;
