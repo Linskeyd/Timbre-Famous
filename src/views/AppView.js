@@ -19,6 +19,20 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {};
 
+    AppView.prototype.slideRight = function() {
+        this.pageModifier.setTransform(Transform.translate(276, 0, 0), {
+            duration: 300,
+            curve: 'easeOut'
+        });
+    };
+
+    AppView.prototype.slideLeft = function() {
+        this.pageModifier.setTransform(Tranform.translate(0, 0, 0), {
+            duration: 300,
+            curve: 'easeOut'
+        });
+    };
+
     function _createPageView() {
         this.pageView = new PageView();
         this.pageModifier = new StateModifier();
