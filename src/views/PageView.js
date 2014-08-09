@@ -6,12 +6,17 @@ define(function(require, exports, module) {
     var HeaderFooter = require('famous/views/HeaderFooterLayout');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
+    //Include Fast click to prevent 300 ms delay
+    var FastClick = require('famous/inputs/FastClick');
+
     function PageView() {
         View.apply(this, arguments);
 
         _createLayout.call(this);
         _createHeader.call(this);
         _createBody.call(this);
+
+        _setListeners.call(this);
     }
 
     PageView.prototype = Object.create(View.prototype);
@@ -87,6 +92,12 @@ define(function(require, exports, module) {
         });
 
         this.layout.content.add(this.bodySurface);
+    }
+
+    function _setListeners() {
+        this.hamburgerSurface.on('click', function() {
+            this._eventOutput.emit('menuToggle');
+        }.bind(this));
     }
 
     module.exports = PageView;
