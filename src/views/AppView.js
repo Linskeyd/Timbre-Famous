@@ -9,6 +9,8 @@ define(function(require, exports, module) {
     function AppView() {
         View.apply(this, arguments);
 
+        this.menuToggle = false;
+
         _createPageView.call(this);
 
         _setListeners.call(this);
