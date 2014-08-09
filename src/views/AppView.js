@@ -3,6 +3,7 @@ define(function(require, exports, module) {
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
+    var Easing = require('famous/transitions/Easing');
 
     var PageView = require('views/PageView');
 
@@ -19,7 +20,13 @@ define(function(require, exports, module) {
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
 
-    AppView.DEFAULT_OPTIONS = {};
+    AppView.DEFAULT_OPTIONS = {
+        openPosition: 276,
+        transition: {
+            duration: 300,
+            curve: Easing.inOutBack
+        }
+    };
 
     AppView.prototype.toggleMenu = function() {
 
@@ -33,17 +40,11 @@ define(function(require, exports, module) {
     }
 
     AppView.prototype.slideRight = function() {
-        this.pageModifier.setTransform(Transform.translate(276, 0, 0), {
-            duration: 300,
-            curve: 'easeOut'
-        });
+        this.pageModifier.setTransform(Transform.translate(this.options.openPosition, 0, 0), this.options.transition);
     };
 
     AppView.prototype.slideLeft = function() {
-        this.pageModifier.setTransform(Transform.translate(0, 0, 0), {
-            duration: 300,
-            curve: 'easeOut'
-        });
+        this.pageModifier.setTransform(Transform.translate(0, 0, 0), this.options.transition);
     };
 
     function _createPageView() {
