@@ -60,7 +60,7 @@ define(function(require, exports, module) {
         });
 
         var iconModifier = new StateModifier({
-            tranform: Transform.translate(24, 2, 0)
+            transform: Transform.translate(24, 2, 0)
         });
 
         this.add(iconModifier).add(iconSurface);
@@ -78,8 +78,8 @@ define(function(require, exports, module) {
             }
         });
 
-        var titleModfier = new StateModifier({
-            tranform: Transform.thenMove(Tranform.rotateZ(this.options.angle), [75, -5, 0])
+        var titleModifier = new StateModifier({
+            transform: Transform.thenMove(Transform.rotateZ(this.options.angle), [75, -5, 0])
         });
 
         this.add(titleModifier).add(titleSurface);
