@@ -40,7 +40,7 @@ define(function(require, exports, module) {
     };
 
     AppView.prototype.slideLeft = function() {
-        this.pageModifier.setTransform(Tranform.translate(0, 0, 0), {
+        this.pageModifier.setTransform(Transform.translate(0, 0, 0), {
             duration: 300,
             curve: 'easeOut'
         });
