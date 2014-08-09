@@ -4,6 +4,8 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Easing = require('famous/transitions/Easing');
+    var Transitionable = require('famous/transitions/Transitionable');
+    var Modifier = require('famous/core/Modifier');
 
     var MenuView = require('views/MenuView');
     var StripData = require('data/StripData');
@@ -19,7 +21,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         this.menuToggle = false;
-        this.pageViewPos = 0;
+        this.pageViewPos = new Transitionable(0);
 
         _createPageView.call(this);
         _createMenuView.call(this);
@@ -37,7 +39,9 @@ define(function(require, exports, module) {
         transition: {
             duration: 300,
             curve: Easing.inOutBack
-        }
+        },
+        posThreshold: 138,
+        velThreshold: 0.75
     };
 
     AppView.prototype.toggleMenu = function() {
@@ -46,22 +50,31 @@ define(function(require, exports, module) {
             this.slideLeft();
         } else {
             this.slideRight();
+            this.menuView.animateStrips();
         }
 
         this.menuToggle = !this.menuToggle;
-    }
+    };
 
     AppView.prototype.slideRight = function() {
-        this.pageModifier.setTransform(Transform.translate(this.options.openPosition, 0, 0), this.options.transition);
+        this.pageViewPos.set(this.options.openPosition, this.options.transition, function() {
+            this.menuToggle = true;
+        }.bind(this));
     };
 
     AppView.prototype.slideLeft = function() {
-        this.pageModifier.setTransform(Transform.translate(0, 0, 0), this.options.transition);
+        this.pageViewPos.set(0, this.options.transition, function() {
+            this.menuToggle = false;
+        }.bind(this));
     };
 
     function _createPageView() {
         this.pageView = new PageView();
-        this.pageModifier = new StateModifier();
+        this.pageModifier = new Modifier({
+            transform: function() {
+                return Transform.translate(this.pageViewPos.get(), 0, 0);
+            }.bind(this)
+        });
 
         this.add(this.pageModifier).add(this.pageView);
     }
@@ -89,9 +102,33 @@ define(function(require, exports, module) {
         this.pageView.pipe(sync);
 
         sync.on('update', function(data) {
-            this.pageViewPos += data.delta;
-            this.pageModifier.setTransform(Transform.translate(this.pageViewPos, 0, 0));
+            var currentPosition = this.pageViewPos.get();
+
+            if(currentPosition === 0 && data.velocity > 0) {
+                this.menuView.animateStrips();
+            }
+
+            this.pageViewPos.set(Math.max(0, currentPosition + data.delta));
         }.bind(this));
+
+        sync.on('end', (function(data) {
+            var velocity = data.velocity;
+            var position = this.pageViewPos.get();
+
+            if(position > this.options.posThreshold) {
+                if(velocity < -this.options.velThreshold) {
+                    this.slideLeft();
+                } else {
+                    this.slideRight();
+                }
+            } else {
+                if(velocity > this.options.velThreshold) {
+                    this.slideRight();
+                } else {
+                    this.slideLeft();
+                }
+            }
+        }).bind(this));
     }
 
     module.exports = AppView;
